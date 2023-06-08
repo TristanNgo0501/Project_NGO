@@ -1,10 +1,14 @@
-﻿namespace Project_NGO.Models
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata.Ecma335;
+
+namespace Project_NGO.Models
 {
-    public class User
+    public class User:IdentityUser<int>
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string? Name { get; set; }
-        public string? Email { get; set; }
+        public string? CustomEmail { get; set; }
         public string? Password { get; set; }
         public string? Rank { get; set; }
         public string? Address { get; set; }
