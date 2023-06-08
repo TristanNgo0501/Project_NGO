@@ -2,6 +2,7 @@
 using Project_NGO.Data;
 using Project_NGO.Models;
 using Project_NGO.Repositories;
+using Project_NGO.Repositories.UploadFileRepo;
 
 namespace Project_NGO.Services;
 
@@ -38,8 +39,8 @@ public class ProgramService:ProgramRepository
     {
         if (file != null && file.Length > 0)
         {
-            var fileName = _fileRepository.UploadFile(file);
-            programs.Image = "/Upload/" + fileName;
+            var fileName = _fileRepository.UploadFile(file, "Programs");
+            programs.Image = "http://localhost:5065/Programs/" + fileName;
         }
 
         await _databaseContext.Programs.AddAsync(programs);
@@ -53,8 +54,8 @@ public class ProgramService:ProgramRepository
         if (file != null && file.Length >0)
         {
             _fileRepository.DeleteFile(pro.Image);
-            var fileName = _fileRepository.UploadFile(file);
-            programs.Image = "/Upload" + fileName;
+            var fileName = _fileRepository.UploadFile(file, "Programs");
+            programs.Image = "http://localhost:5065/Programs/" + fileName;
             _databaseContext.Entry(programs).State = EntityState.Modified;
             await _databaseContext.SaveChangesAsync();
             return programs;
