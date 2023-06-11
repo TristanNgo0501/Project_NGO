@@ -1,19 +1,21 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using Project_NGO.Data;
 using Project_NGO.Models;
+using Project_NGO.Repositories;
+using Project_NGO.Repositories.AccouttingRepo;
 using Project_NGO.Repositories.Authenication;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
+using Project_NGO.Services;
+using Project_NGO.Services.AccountingService;
 using Project_NGO.Services.Authenication;
 using Project_NGO.Services.UploadFileService;
 using Project_NGO.Services.UserService;
 using System.Text;
-using Project_NGO.Repositories;
-using Project_NGO.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +43,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddScoped<IAuthRepository, AuthServiceImp>();
 builder.Services.AddScoped<IUserRepository, UserServiceImp>();
 builder.Services.AddScoped<IFileRepository, FileServiceImp>();
-
+builder.Services.AddScoped<IAccountingRepository, AccountingServiceImp>();
 // config cors dung tren trinh duyet
 builder.Services.AddCors(options =>
 {
@@ -71,7 +73,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 var app = builder.Build();
 app.UseCors();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
