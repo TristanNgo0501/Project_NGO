@@ -1,42 +1,51 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Project_NGO.Data;
 using Project_NGO.Models;
 using Project_NGO.Repositories;
 using Project_NGO.Repositories.UploadFileRepo;
+using Project_NGO.Requests;
 
 namespace Project_NGO.Services;
 
-public class ProgramService:ProgramRepository
+public class ProgramService : ProgramRepository
 {
     private readonly DatabaseContext _databaseContext;
     private readonly IFileRepository _fileRepository;
-    private readonly string _uploadFolder;
+    private readonly IMapper _mapper;
 
-    public ProgramService(DatabaseContext databaseContext, IFileRepository repository,IWebHostEnvironment webHostEnvironment)
+    public ProgramService(DatabaseContext databaseContext, IFileRepository repository, IMapper mapper)
     {
         _databaseContext = databaseContext;
         _fileRepository = repository;
-        _uploadFolder = Path.Combine(webHostEnvironment.ContentRootPath, "Upload");
+        _mapper = mapper;
     }
 
-    public async Task<List<Programs>> GetProgramList()
+    public async Task<List<ProgramDTO>> GetProgramList()
     {
-        return await  _databaseContext.Programs.ToListAsync();
+        var listPro = await _databaseContext.Programs.ToListAsync();
+        if (listPro == null)
+        {
+            return null;
+        }
+        var listDto = _mapper.Map<List<ProgramDTO>>(listPro);
+        return listDto;
     }
 
-    public async Task<Programs> GetProgramById(int id)
+    public async Task<ProgramDTO> GetProgramById(int id)
     {
         var pro = await _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == id);
-        if (pro != null)
+        if (pro == null)
         {
-            return pro;
+            return null;
         }
-
-        return null;
+        var proDto = _mapper.Map<ProgramDTO>(pro);
+        return proDto;
     }
 
-    public async  Task<Programs> AddProgram(Programs programs, IFormFile? file)
+    public async Task<ProgramDTO> AddProgram(ProgramDTO programDto, IFormFile? file)
     {
+        var programs = _mapper.Map<Programs>(programDto);
         if (file != null && file.Length > 0)
         {
             var fileName = _fileRepository.UploadFile(file, "Programs");
@@ -45,33 +54,41 @@ public class ProgramService:ProgramRepository
 
         await _databaseContext.Programs.AddAsync(programs);
         await _databaseContext.SaveChangesAsync();
-        return programs;
+        var addedProgramDto = _mapper.Map<ProgramDTO>(programs);
+        return addedProgramDto;
     }
 
-    public async Task<Programs> UpdateProgram(Programs programs, IFormFile? file)
+    public async Task<ProgramDTO> UpdateProgram(ProgramDTO programDto, int id, IFormFile? file)
     {
-        var pro = await  _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == programs.Id);
-        if (file != null && file.Length >0)
+        var programs = _mapper.Map<Programs>(programDto);
+        programs.Id = id;
+        var pro = await _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == programs.Id);
+        if (pro == null)
+        {
+            return null;
+        }
+        ;
+
+        if (file != null && file.Length > 0)
         {
             _fileRepository.DeleteFile(pro.Image);
             var fileName = _fileRepository.UploadFile(file, "Programs");
             programs.Image = "http://localhost:5065/Programs/" + fileName;
-            _databaseContext.Entry(programs).State = EntityState.Modified;
-            await _databaseContext.SaveChangesAsync();
-            return programs;
         }
         else
         {
             programs.Image = pro.Image;
-            _databaseContext.Entry(programs).State = EntityState.Modified;
-            await _databaseContext.SaveChangesAsync();
-            return programs;
         }
+        _databaseContext.Entry(programs).State = EntityState.Modified;
+        await _databaseContext.SaveChangesAsync();
+
+        var updatedProgramDto = _mapper.Map<ProgramDTO>(programs);
+        return updatedProgramDto;
     }
 
     public async Task<bool> DeleteProgram(int id)
     {
-        var pro = await  _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == id);
+        var pro = await _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == id);
         if (pro != null)
         {
             _fileRepository.DeleteFile(pro.Image);

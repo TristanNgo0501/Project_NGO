@@ -2,11 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Project_NGO.Models;
 using Project_NGO.Models.Authenication;
 using Project_NGO.Repositories;
+using Project_NGO.Requests;
 using Project_NGO.Utils;
 
 namespace Project_NGO.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProgramController : ControllerBase
     {
@@ -19,14 +20,14 @@ namespace Project_NGO.Controllers
 
         // GET: api/Program
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Programs>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ProgramDTO>>> GetAll()
         {
             try
             {
                 var list = await _repository.GetProgramList();
                 if (list != null && list.Any())
                 {
-                    var response = new CustomStatusResult<IEnumerable<Programs>>
+                    var response = new CustomStatusResult<IEnumerable<ProgramDTO>>
                         (StatusCodes.Status200OK, "Get List Program Successfully", list, null);
                     return Ok(response);
                 }
@@ -52,11 +53,13 @@ namespace Project_NGO.Controllers
                 var resource = await _repository.GetProgramById(id);
                 if (resource != null)
                 {
-                    return Ok(resource);
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status200OK, "Get Program Successfully", resource, null);
+                    return Ok(response);
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "404", Message = "Can not get list" });
+                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "404", Message = "Can not get program" });
                 }
             }
             catch (Exception)
@@ -67,14 +70,16 @@ namespace Project_NGO.Controllers
 
         // POST: api/Program
         [HttpPost]
-        public async Task<ActionResult> AddPrograms([FromForm] Programs programs, IFormFile? file)
+        public async Task<ActionResult> AddPrograms([FromForm] ProgramDTO programDto, IFormFile? file)
         {
             try
             {
-                var resource = await _repository.AddProgram(programs, file);
+                var resource = await _repository.AddProgram(programDto, file);
                 if (resource != null)
                 {
-                    return Ok(resource);
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status201Created, "Added Program Successfully", resource, null);
+                    return Ok(response);
                 }
                 else
                 {
@@ -88,15 +93,17 @@ namespace Project_NGO.Controllers
         }
 
         // PUT: api/Program/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateProgram([FromForm] Programs programs, IFormFile? file)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> UpdateProgram([FromForm] ProgramDTO programDto, int id, IFormFile? file)
         {
             try
             {
-                var resource = await _repository.UpdateProgram(programs, file);
+                var resource = await _repository.UpdateProgram(programDto, id, file);
                 if (resource != null)
                 {
-                    return Ok(resource);
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status200OK, "Updated Program Successfully", resource, null);
+                    return Ok(response);
                 }
                 else
                 {
@@ -118,7 +125,7 @@ namespace Project_NGO.Controllers
                 var resource = await _repository.DeleteProgram(id);
                 if (resource != null)
                 {
-                    return Ok(resource);
+                    return StatusCode(StatusCodes.Status200OK, new Response { Status = "200", Message = "Deleted Successfully" });
                 }
                 else
                 {
