@@ -6,6 +6,7 @@ namespace Project_NGO.Services.UploadFileService
     {
         private readonly string upLoadFolder;
         private readonly string typeFolder;
+
         public FileServiceImp(IWebHostEnvironment webHostEnvironment)
         {
             upLoadFolder = Path.Combine(webHostEnvironment.ContentRootPath, "Uploads");
@@ -14,6 +15,7 @@ namespace Project_NGO.Services.UploadFileService
                 Directory.CreateDirectory(upLoadFolder);
             }
         }
+
         public async Task<bool> DeleteFile(string filePath)
         {
             if (!string.IsNullOrEmpty(filePath))
