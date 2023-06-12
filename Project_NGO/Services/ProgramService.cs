@@ -48,7 +48,7 @@ public class ProgramService : ProgramRepository
         var programs = _mapper.Map<Programs>(programDto);
         if (file != null && file.Length > 0)
         {
-            var fileName = _fileRepository.UploadFile(file, "Programs");
+            var fileName = await _fileRepository.UploadFile(file, "Programs");
             programs.Image = "http://localhost:5065/Programs/" + fileName;
         }
 
@@ -71,8 +71,8 @@ public class ProgramService : ProgramRepository
 
         if (file != null && file.Length > 0)
         {
-            _fileRepository.DeleteFile(pro.Image);
-            var fileName = _fileRepository.UploadFile(file, "Programs");
+            await _fileRepository.DeleteFile(pro.Image);
+            var fileName = await _fileRepository.UploadFile(file, "Programs");
             programs.Image = "http://localhost:5065/Programs/" + fileName;
         }
         else
@@ -91,7 +91,7 @@ public class ProgramService : ProgramRepository
         var pro = await _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == id);
         if (pro != null)
         {
-            _fileRepository.DeleteFile(pro.Image);
+            await _fileRepository.DeleteFile(pro.Image);
             _databaseContext.Programs.Remove(pro);
             await _databaseContext.SaveChangesAsync();
         }
