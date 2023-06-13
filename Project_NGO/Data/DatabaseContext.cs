@@ -23,6 +23,7 @@ namespace Project_NGO.Data
             modelBuilder.Entity<Accounting>().ToTable("Accounting").HasKey(u => u.Id);
             modelBuilder.Entity<About>().ToTable("Abouts").HasKey(u => u.Id);
             modelBuilder.Entity<About_Image>().ToTable("About_Images").HasKey(u => u.Id);
+            modelBuilder.Entity<Contact_Form>().ToTable("Contact_Form").HasKey(u=>u.Id);
 
             modelBuilder.Entity<Receipt>()
                 .HasOne(r => r.Accounting)
@@ -65,5 +66,6 @@ namespace Project_NGO.Data
         public DbSet<Accounting> Accountings { get; set; }
         public DbSet<About> Abouts { get; set; }
         public DbSet<About_Image> Abouts_Images { get; set; }
+        public DbSet<Contact_Form> Contact_Forms { get; set; }
     }
 }
