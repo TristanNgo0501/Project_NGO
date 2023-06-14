@@ -8,7 +8,7 @@ using System.Resources;
 
 namespace Project_NGO.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CategoryController : ControllerBase
     {

@@ -15,5 +15,6 @@ namespace Project_NGO.Repositories.Authenication
         Task<string> Login(LoginModel model);
         Task SendMail(MailConfig mailConfig);
         Task<User> ChangePassword(ChangePassword changePassword);
+        Task<User> ResetPassword(string email);
     }
 }

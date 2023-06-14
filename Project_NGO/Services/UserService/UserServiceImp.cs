@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Project_NGO.Data;
 using Project_NGO.Models;
+using Project_NGO.Models.Authenication.Register;
+using Project_NGO.Models.Authenication;
 using Project_NGO.Models.UserModel;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
+using System.Security.Policy;
 using System.Xml.Linq;
 
 namespace Project_NGO.Services.UserService
@@ -20,14 +23,60 @@ namespace Project_NGO.Services.UserService
             dbcontext = _dbcontext;
             fileRepo = _fileRepo;
         }
-        public Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(string email)
         {
-            throw new NotImplementedException();
+            var userExist = await dbcontext.Users.FirstOrDefaultAsync(u => u.Email.Equals(email));
+            if(userExist != null)
+            {
+                if (userExist.Image != null && userExist.Image != "")
+                {
+                    await fileRepo.DeleteFile(userExist.Image);
+                }
+                dbcontext.Users.Remove(userExist);
+                await dbcontext.SaveChangesAsync();
+                return true;
+            } else { return false; }
         }
 
-        public Task<IEnumerable<User>> GetListUserAsync()
+        public async Task<IEnumerable<UserModel>> GetListUserAsync()
         {
-            throw new NotImplementedException();
+            var list = await dbcontext.Users.Where(u => u.Role != RoleModel.Admin && u.Role != RoleModel.Manager)
+                                            .Select(u => new UserModel
+                                            {
+                                                Id = u.Id,
+                                                Name = u.Name,
+                                                Email = u.Email,
+                                                Rank = u.Rank,
+                                                Address = u.Address,
+                                                Phone = u.Phone,
+                                                Image = u.Image,
+                                                Region = u.Region,
+                                                Role = u.Role,
+                                                Status = u.Status
+                                            })
+                                            .ToListAsync();
+            if (list.Count > 0 && list.Any())
+            {
+                return list;
+            }
+            return null;
+        }
+
+        public async Task<IEnumerable<InforUserReceipt>> GetListUserReceipt()
+        {
+            var list = await dbcontext.Users.Select(u => new InforUserReceipt
+                                            {
+                                                Id=u.Id,
+                                                Name=u.Name,
+                                                Email=u.Email,
+                                                Role = u.Role,
+                                            })
+                                            .ToListAsync();
+            if (list.Count > 0 && list.Any())
+            {
+                return list;
+            }
+            return null;
         }
 
         public async Task<UserModel> GetUserAsync(string email)
@@ -65,29 +114,42 @@ namespace Project_NGO.Services.UserService
                     }
                     var fileName = await fileRepo.UploadFile(photo, "Users");
                     userExist.Name = userModel.Name;
-                    userExist.Rank = userModel.Rank;
                     userExist.Address = userModel.Address;
                     userExist.Phone = userModel.Phone;
                     userExist.Image = "http://localhost:5065/Users/" + fileName;
                     userExist.Region = userModel.Region;
                     userExist.Status = userModel.Status;
-                    await userManager.UpdateAsync(userExist);
-
+                    CheckUserModelNull(userExist);
+                     dbcontext.Users.Update(userExist);
+                    await dbcontext.SaveChangesAsync();
                     return userExist;
                 }
                 else
                 {
                     userExist.Name = userModel.Name;
-                    userExist.Rank = userModel.Rank;
                     userExist.Address = userModel.Address;
                     userExist.Phone = userModel.Phone;
                     userExist.Region = userModel.Region;
                     userExist.Status = userModel.Status;
-                    await userManager.UpdateAsync(userExist);
+                    CheckUserModelNull(userExist);
+                    dbcontext.Users.Update(userExist);
+                    await dbcontext.SaveChangesAsync();
                     return userExist;
 
                 }
             } else { return null; }
+        }
+
+        private User CheckUserModelNull(User user)
+        {
+            var entry = dbcontext.Entry(user);
+            if (user.Address == null || user.Address == "null")
+                entry.Property(u => u.Address).IsModified = false;
+            if (user.Phone == null || user.Phone == "null")
+                entry.Property(u => u.Phone).IsModified = false;
+            if (user.Region == null || user.Region == "null")
+                entry.Property(u => u.Region).IsModified = false;
+            return user;
         }
     }
 }
