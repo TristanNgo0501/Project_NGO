@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Project_NGO.Models;
 using Project_NGO.Repositories.Categories;
+using Project_NGO.Requests.Categories;
 using Project_NGO.Utils;
 using System.Resources;
 
@@ -75,56 +76,57 @@ namespace Project_NGO.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> AddCategory([FromForm] Category category, IFormFile? photo)
+        public async Task<ActionResult<CategoryDTO>> AddCategory([FromForm] CategoryDTO categoryDto, IFormFile? photo)
         {
             try
             {
-                var resource = await _categoryRepository.AddCategoryAsync(category, photo);
+                var resource = await _categoryRepository.AddCategoryAsync(categoryDto, photo);
                 if(resource != null)
                 {
-                    var response = new CustomStatusResult<Category>(201,"Resource created",category,null);
-                    return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
+                    var response = new CustomStatusResult<CategoryDTO>(StatusCodes.Status201Created,"Resource created", resource, null);
+                    return Ok(response);
                 }
                 else
                 {
-                    var reponse= new CustomStatusResult<Category>(400,"Unable to create resource",null,null);
+                    var reponse= new CustomStatusResult<Category>(StatusCodes.Status400BadRequest,"Unable to create resource",null,null);
                     return BadRequest(reponse);
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new CustomStatusResult<Category>()
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
                 {
-                    Message = "An error occurred while retrieving the model.",
-                    Error = new List<string> { ex.Message }
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
                 });
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Category>> UpdateCategory([FromForm] Category category, IFormFile? photo)
+        public async Task<ActionResult<Category>> UpdateCategory([FromForm] CategoryDTO categoryDto,int id, IFormFile? photo)
          {
             try
             {
-                var resource =  await _categoryRepository.GetCategoryByIdAsync(category.Id);
-                if(resource != null)
+                    var resource = await _categoryRepository.UpdateCategoryAsync(categoryDto,id, photo);
+                if (resource != null)
                 {
-                    var resourceUpdate = await _categoryRepository.UpdateCategoryAsync(category, photo);
-                    var response = new CustomStatusResult<Category>(200, "update category successfully", resourceUpdate, null);
+                    var response = new CustomStatusResult<Category>(StatusCodes.Status200OK, "update category successfully", resource, null);
                     return Ok(response);
                 }
                 else
                 {
-                    var response = new CustomStatusResult<Category>(404, "No category to update", null, null) ;
-                    return NotFound(response);
+                    var response = new CustomStatusResult<Category>(StatusCodes.Status400BadRequest, "No category to update", resource, null) ;
+                    return BadRequest(response);
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new CustomStatusResult<Category>()
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
                 {
-                    Message = "An error occurred while retrieving the model.",
-                    Error = new List<string> { ex.Message }
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
                 });
             }
         }

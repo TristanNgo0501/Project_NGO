@@ -1,37 +1,38 @@
 ﻿
 
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Project_NGO.Data;
 using Project_NGO.Models;
 using Project_NGO.Repositories.Categories;
+using Project_NGO.Repositories.UploadFileRepo;
+using Project_NGO.Requests.Categories;
 
 namespace Project_NGO.Services.Categories
 {
     public class CategoryServiceImp : ICategory
     {
         private readonly DatabaseContext _dbContext;
-        private readonly string _uploadFolder;
-
-        public CategoryServiceImp(DatabaseContext dbContext, IWebHostEnvironment webHostEnvironment )
+        private readonly IFileRepository _fileRepository;
+        private readonly IMapper _mapper;
+        public CategoryServiceImp(DatabaseContext dbContext, IFileRepository fileRepository, IMapper mapper)
         {
             _dbContext = dbContext;
-            _uploadFolder = Path.Combine(webHostEnvironment.ContentRootPath,"Upload");
+            _fileRepository = fileRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Category> AddCategoryAsync(Category category,IFormFile photo)
+        public async Task<CategoryDTO> AddCategoryAsync(CategoryDTO categoryDto,IFormFile photo)
         {
+            var cate = _mapper.Map<Category>(categoryDto);
            if (photo!= null && photo.Length>0) {
-            string fileName= Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
-            string filePath= Path.Combine(_uploadFolder,fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await photo.CopyToAsync(stream);
-                }
-                category.Image = "/Upload/" + fileName;
+                var fileName = await _fileRepository.UploadFile(photo, "Category");
+                cate.Image = "http://localhost:5065/Category/" + fileName;
             }
-           await _dbContext.Categories.AddAsync(category);
+           await _dbContext.Categories.AddAsync(cate);
            await _dbContext.SaveChangesAsync();
-            return category;
+            var cateDto = _mapper.Map<CategoryDTO>(cate);
+            return cateDto;
         }
 
         public async Task<bool> DeleteCategoryAsync(int id)
@@ -39,14 +40,7 @@ namespace Project_NGO.Services.Categories
             var category = await GetCategoryByIdAsync(id);
             if (category != null)
             {
-                if(!string.IsNullOrEmpty(category.Image))
-                { 
-                    string filePath= Path.Combine(_uploadFolder,category.Image);
-                    if(File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                    }
-                }
+                await _fileRepository.DeleteFile(category.Image);
                 _dbContext.Categories.Remove(category);
                 await _dbContext.SaveChangesAsync();
                 return true;
@@ -65,42 +59,31 @@ namespace Project_NGO.Services.Categories
     
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
+
             return await _dbContext.Categories.FindAsync(id);
         }
 
-        public async Task<Category> UpdateCategoryAsync(Category category, IFormFile? photo)
+        public async Task<Category> UpdateCategoryAsync(CategoryDTO categoryDto,int id, IFormFile? photo)
         {
-            var cateDb = await _dbContext.Categories.FindAsync(category.Id);
+            var cate = _mapper.Map<Category>(categoryDto);
+            cate.Id = id;
+            var cateDb = await _dbContext.Categories.FindAsync(cate.Id);
             if(photo != null && photo.Length>0)
             {
-                if (!string.IsNullOrEmpty(cateDb.Image))
-                {
-                    string filePathUpdate = Path.Combine(_uploadFolder,cateDb.Image);
-                    if (File.Exists(filePathUpdate))
-                    {
-                        File.Delete(filePathUpdate);
-                    }
-                }
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
-                string filePath = Path.Combine(_uploadFolder, fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await photo.CopyToAsync(stream);
-                }
-                category.Image = "/Upload/" + fileName;
-                _dbContext.Entry(category).State= EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return category;
+                await _fileRepository.DeleteFile(cateDb.Image);
+                var fileName = await _fileRepository.UploadFile(photo, "Category");
+                cate.Image = "http://localhost:5065/Category/" + fileName;
             }
             else
             {
-                category.Image = cateDb.Image;
-                _dbContext.Entry(category).State= EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return category;
+                cate.Image = cateDb.Image;
             }
+            _dbContext.Entry(cateDb).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            //var updatedCate = _mapper.Map<CategoryDTO>(cate);
+            return cate;
 
-            }
+        }
         }
     }
 

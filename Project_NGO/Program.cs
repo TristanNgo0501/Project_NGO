@@ -38,7 +38,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options => options.User.Re
                 .AddDefaultTokenProviders();
 
 // config dbcontext
-builder.Services.AddScoped<IFileRepository, FIleService>();
+builder.Services.AddScoped<IFileRepository, FileServiceImp>();
 builder.Services.AddScoped<ICategory, CategoryServiceImp>();
 builder.Services.AddScoped<IContactForm, ContactFormServiceImp>();
 builder.Services.AddDbContext<DatabaseContext>(options =>
