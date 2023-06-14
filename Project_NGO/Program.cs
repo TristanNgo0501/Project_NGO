@@ -12,12 +12,16 @@ using Project_NGO.Repositories.CashOutRepo;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
 using Project_NGO.Requests.Program;
+using Project_NGO.Repositories.Categories;
+using Project_NGO.Repositories.NewFolder;
 using Project_NGO.Services;
 using Project_NGO.Services.Authenication;
 using Project_NGO.Services.CashOutService;
 using Project_NGO.Services.UploadFileService;
 using Project_NGO.Services.UserService;
 using System.Text;
+using Project_NGO.Services.Categories;
+using Project_NGO.Services.ContactForm;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +41,9 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options => options.User.Re
                 .AddDefaultTokenProviders();
 
 // config dbcontext
+builder.Services.AddScoped<IFileRepository, FileServiceImp>();
+builder.Services.AddScoped<ICategory, CategoryServiceImp>();
+builder.Services.AddScoped<IContactForm, ContactFormServiceImp>();
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectDb"));
