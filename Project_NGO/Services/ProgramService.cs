@@ -51,7 +51,7 @@ public class ProgramService : ProgramRepository
             var fileName = await _fileRepository.UploadFile(file, "Programs");
             programs.Image = "http://localhost:5065/Programs/" + fileName;
         }
-
+        programs.CreatedAt = DateTime.Now;
         await _databaseContext.Programs.AddAsync(programs);
         await _databaseContext.SaveChangesAsync();
         var addedProgramDto = _mapper.Map<ProgramDTO>(programs);
@@ -89,13 +89,13 @@ public class ProgramService : ProgramRepository
     public async Task<bool> DeleteProgram(int id)
     {
         var pro = await _databaseContext.Programs.SingleOrDefaultAsync(p => p.Id == id);
-        if (pro != null)
+        if (pro == null)
         {
-            await _fileRepository.DeleteFile(pro.Image);
-            _databaseContext.Programs.Remove(pro);
-            await _databaseContext.SaveChangesAsync();
+            return false;
         }
-
+        await _fileRepository.DeleteFile(pro.Image);
+        _databaseContext.Programs.Remove(pro);
+        await _databaseContext.SaveChangesAsync();
         return true;
     }
 }

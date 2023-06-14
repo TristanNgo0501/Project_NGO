@@ -12,8 +12,8 @@ using Project_NGO.Data;
 namespace Project_NGO.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230601063516_configIdentityUser")]
-    partial class configIdentityUser
+    [Migration("20230613144739_initdatabase")]
+    partial class initdatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -227,28 +227,6 @@ namespace Project_NGO.Migrations
                     b.ToTable("About_Images", (string)null);
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.Accounting", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("Remain_Money")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Total_Price_In")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Total_Price_Out")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Accounting", (string)null);
-                });
-
             modelBuilder.Entity("Project_NGO.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -322,7 +300,7 @@ namespace Project_NGO.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Program_Id")
+                    b.Property<int?>("ProgramId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -330,7 +308,7 @@ namespace Project_NGO.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Program_Id");
+                    b.HasIndex("ProgramId");
 
                     b.ToTable("Program_Images", (string)null);
                 });
@@ -343,13 +321,13 @@ namespace Project_NGO.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Budget")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal?>("Budget")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Category_Id")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -369,7 +347,7 @@ namespace Project_NGO.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Category_Id");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Programs", (string)null);
                 });
@@ -382,7 +360,7 @@ namespace Project_NGO.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -391,17 +369,20 @@ namespace Project_NGO.Migrations
                     b.Property<decimal>("Money")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("Program_Id")
+                    b.Property<int?>("ProgramId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("User_Id")
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Program_Id");
+                    b.HasIndex("ProgramId");
 
-                    b.HasIndex("User_Id");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Receipts", (string)null);
                 });
@@ -571,23 +552,11 @@ namespace Project_NGO.Migrations
                     b.Navigation("About");
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.Accounting", b =>
-                {
-                    b.HasOne("Project_NGO.Models.Receipt", "Receipt")
-                        .WithOne("Accounting")
-                        .HasForeignKey("Project_NGO.Models.Accounting", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Receipt_Accounting");
-
-                    b.Navigation("Receipt");
-                });
-
             modelBuilder.Entity("Project_NGO.Models.Program_Image", b =>
                 {
                     b.HasOne("Project_NGO.Models.Programs", "Programs")
-                        .WithMany("Program_Images")
-                        .HasForeignKey("Program_Id")
+                        .WithMany("ProgramImages")
+                        .HasForeignKey("ProgramId")
                         .HasConstraintName("FK_Program_ProImages");
 
                     b.Navigation("Programs");
@@ -597,7 +566,7 @@ namespace Project_NGO.Migrations
                 {
                     b.HasOne("Project_NGO.Models.Category", "Category")
                         .WithMany("Programs")
-                        .HasForeignKey("Category_Id")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Category_Program");
@@ -609,12 +578,14 @@ namespace Project_NGO.Migrations
                 {
                     b.HasOne("Project_NGO.Models.Programs", "Programs")
                         .WithMany("Receipt")
-                        .HasForeignKey("Program_Id")
+                        .HasForeignKey("ProgramId")
                         .HasConstraintName("FK_Receipt_Program");
 
                     b.HasOne("Project_NGO.Models.User", "User")
                         .WithMany("Receipt")
-                        .HasForeignKey("User_Id")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK_Receipt_User");
 
                     b.Navigation("Programs");
@@ -634,15 +605,9 @@ namespace Project_NGO.Migrations
 
             modelBuilder.Entity("Project_NGO.Models.Programs", b =>
                 {
-                    b.Navigation("Program_Images");
+                    b.Navigation("ProgramImages");
 
                     b.Navigation("Receipt");
-                });
-
-            modelBuilder.Entity("Project_NGO.Models.Receipt", b =>
-                {
-                    b.Navigation("Accounting")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Project_NGO.Models.User", b =>
