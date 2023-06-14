@@ -9,6 +9,7 @@ using Project_NGO.Models;
 using Project_NGO.Repositories;
 using Project_NGO.Repositories.Authenication;
 using Project_NGO.Repositories.CashOutRepo;
+using Project_NGO.Repositories.Chart;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
 using Project_NGO.Requests.Program;
@@ -17,6 +18,7 @@ using Project_NGO.Repositories.NewFolder;
 using Project_NGO.Services;
 using Project_NGO.Services.Authenication;
 using Project_NGO.Services.CashOutService;
+using Project_NGO.Services.Chart;
 using Project_NGO.Services.UploadFileService;
 using Project_NGO.Services.UserService;
 using System.Text;
@@ -54,6 +56,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddScoped<IAuthRepository, AuthServiceImp>();
 builder.Services.AddScoped<IUserRepository, UserServiceImp>();
 builder.Services.AddScoped<IFileRepository, FileServiceImp>();
+builder.Services.AddScoped<IChartRepository, ChartServiceImp>();
 
 // config cors dung tren trinh duyet
 builder.Services.AddCors(options =>

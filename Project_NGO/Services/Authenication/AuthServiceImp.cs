@@ -46,11 +46,6 @@ namespace Project_NGO.Services.Authenication
                     UserName = model.Email
                     
                 };
-                // hashpassword ko dinh loi error cua identity passwordHash(se custom theo y minh dc)
-                ///var passwordHasher = new PasswordHasher<User>();
-                //var hashedPassword = passwordHasher.HashPassword(user, model.Password);
-
-               // user.PasswordHash = hashedPassword;
 
                 var result = await userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -124,8 +119,6 @@ namespace Project_NGO.Services.Authenication
             message.Body = mailConfig.Body;
             message.IsBodyHtml = true;
 
-            //alternateview htmlview = alternateview.createalternateviewfromstring(mailconfig.body, null, mediatypenames.text.html);
-            //message.alternateviews.add(htmlview);
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mailConfig.Body, null, MediaTypeNames.Text.Html);
             message.AlternateViews.Add(htmlView);
 
@@ -147,13 +140,18 @@ namespace Project_NGO.Services.Authenication
             var userExist = await userManager.FindByEmailAsync(changePassword.Email);
             if(userExist != null && await CheckPassword(userExist.Password, changePassword.OldPassword))
             {
-                //var token = await userManager.GeneratePasswordResetTokenAsync(userExist);
-                // hashpassword ko dinh loi error cua identity passwordHash(se custom theo y minh dc)
-                //var passwordHasher = new PasswordHasher<User>();
-                //var newPass = passwordHasher.HashPassword(userExist, changePassword.NewPassword);
-
-                //return await userManager.ResetPasswordAsync(userExist, token, newPass);
                 userExist.Password = SecurityAccount.EncodePlanText(changePassword.NewPassword);
+                await userManager.UpdateAsync(userExist);
+                return userExist;
+            } else { return null; }
+        }
+
+        public async Task<User> ResetPassword(string email)
+        {
+            var userExist = await userManager.FindByEmailAsync(email);
+            if(userExist != null)
+            {
+                userExist.Password = SecurityAccount.EncodePlanText("fptAptech");
                 await userManager.UpdateAsync(userExist);
                 return userExist;
             } else { return null; }

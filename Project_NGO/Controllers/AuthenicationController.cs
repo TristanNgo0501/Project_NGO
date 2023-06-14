@@ -7,6 +7,7 @@ using Project_NGO.Models.Authenication;
 using Project_NGO.Models;
 using Project_NGO.Repositories.Authenication;
 using Project_NGO.Models.Authenication.Email;
+using Project_NGO.Models.CustomResponse;
 
 namespace Project_NGO.Controllers
 {
@@ -26,58 +27,86 @@ namespace Project_NGO.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterModel registerModel)
         {
-            var result = await authRepo.Register(registerModel);
-            if (result != null)
+            try
             {
-                return StatusCode(StatusCodes.Status201Created, new Response { Status = "201", Message = "Create is success" });
+                var result = await authRepo.Register(registerModel);
+                if (result != null)
+                {
+                    return CustomMethodResponse.GetResponse201Created(result, "Create user success");
+                }
+                else
+                {
+                    return CustomMethodResponse.GetResponse400BadResquest("Create user fail");
+                }
             }
-            return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Create is fail" });
+            catch (Exception ex)
+            {
+                return CustomMethodResponse.Response500Error(ex);
+            }
+
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel loginModel)
         {
-            var token = await authRepo.Login(loginModel);
-            if (token != null)
+            try
             {
-                var user = await userManager.FindByEmailAsync(loginModel.Email);
-                if (user != null)
+                var token = await authRepo.Login(loginModel);
+                if (token != null)
                 {
-                    var inforUser = new InfoUserLogin
+                    var user = await userManager.FindByEmailAsync(loginModel.Email);
+                    if (user != null)
                     {
-                        Id = user.Id,
-                        Image = user.Image,
-                        Name = user.Name,
-                        Email = user.Email,
-                        Role = user.Role
-                    };
-                    if(loginModel.Role != null)
-                    {
-                        if(loginModel.Role.Equals(RoleModel.Admin))
+                        var inforUser = new InfoUserLogin
                         {
-                            if(user.Role.Equals(RoleModel.Person) || user.Role.Equals(RoleModel.Organization))
+                            Id = user.Id,
+                            Image = user.Image,
+                            Name = user.Name,
+                            Email = user.Email,
+                            Role = user.Role
+                        };
+                        if (loginModel.Role != null)
+                        {
+                            if (loginModel.Role.Equals(RoleModel.Admin))
                             {
-                                return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "This account has not been registered, please contact the manager to get an account" });
+                                if (user.Role.Equals(RoleModel.Person) || user.Role.Equals(RoleModel.Organization))
+                                {
+                                    return CustomMethodResponse.GetResponse400BadResquest("This account has not been registered, please contact the manager to get an account");
+                                }
                             }
-                        }   
+                        }
+                        return CustomMethodResponse.GetResponse200Ok(new { token, inforUser }, "Login success");
                     }
-                    return Ok(new { token, inforUser });
                 }
+                return CustomMethodResponse.GetResponse400BadResquest("Login fail");
             }
-            return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Login fail" });
+            catch (Exception ex)
+            {
+                return CustomMethodResponse.Response500Error(ex);
+            }
+
         }
 
         [HttpGet]
         public async Task<IActionResult> ListAdmin()
         {
-            var result = await authRepo.ListAdmin();
-            if(result != null)
+            try
             {
-                return Ok(result);
-            } else 
-            {
-                return StatusCode(StatusCodes.Status404NotFound, new Response { Status = "404", Message = "Not found list admin" });
+                var result = await authRepo.ListAdmin();
+                if (result != null)
+                {
+                    return CustomMethodResponse.GetListResponse200Ok(result, "Get list success");
+                }
+                else
+                {
+                    return CustomMethodResponse.GetResponse404NotFound("Get list fail");
+                }
             }
+            catch (Exception ex)
+            {
+                return CustomMethodResponse.Response500Error(ex);
+            }
+
         }
 
         [HttpPost]
@@ -89,16 +118,16 @@ namespace Project_NGO.Controllers
                 
                 if (result.IsCompleted)
                 {
-                    return StatusCode(StatusCodes.Status200OK, new Response { Status = "200", Message = "Send email success" });
+                    return CustomMethodResponse.GetResponse200Ok(result, "Send email success");
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Send mail fail" });
+                    return CustomMethodResponse.GetResponse400BadResquest("Send mail fail");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return CustomMethodResponse.Response500Error(ex);
             }
 
         }
@@ -112,18 +141,39 @@ namespace Project_NGO.Controllers
 
                 if (result != null)
                 {
-                    return StatusCode(StatusCodes.Status200OK, new Response { Status = "200", Message = "Change Password Success" });
+                    return CustomMethodResponse.GetResponse200Ok(result, "Change Password success");
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Change Password Fail" });
+                    return CustomMethodResponse.GetResponse400BadResquest("Change Password fail");
+
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return CustomMethodResponse.Response500Error(ex);
             }
+        }
 
+        [HttpPut("{email}")]
+        public async Task<IActionResult> ResetPassword(string email)
+        {
+            try
+            {
+                var result = await authRepo.ResetPassword(email);
+                if (result != null)
+                {
+                    return CustomMethodResponse.GetResponse200Ok(result, "Reset Password success");
+                }
+                else
+                {
+                    return CustomMethodResponse.GetResponse400BadResquest("Reset Password fail");
+                }
+            }
+            catch (Exception ex)
+            {
+                return CustomMethodResponse.Response500Error(ex);
+            }
         }
 
     }
