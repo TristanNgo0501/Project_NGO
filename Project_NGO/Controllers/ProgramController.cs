@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Project_NGO.Models;
-using Project_NGO.Models.Authenication;
 using Project_NGO.Repositories;
 using Project_NGO.Requests;
 using Project_NGO.Utils;
@@ -40,7 +39,12 @@ namespace Project_NGO.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
             }
         }
 
@@ -59,12 +63,19 @@ namespace Project_NGO.Controllers
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "404", Message = "Can not get program" });
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status404NotFound, "Can not get list Program", null, null);
+                    return NotFound(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
             }
         }
 
@@ -83,12 +94,19 @@ namespace Project_NGO.Controllers
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Invalid Request" });
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status400BadRequest, "Add Program Failed", null, null);
+                    return BadRequest(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
             }
         }
 
@@ -107,12 +125,19 @@ namespace Project_NGO.Controllers
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Invalid Request" });
+                    var response = new CustomStatusResult<ProgramDTO>
+                         (StatusCodes.Status400BadRequest, "Update Program Failed", null, null);
+                    return BadRequest(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
             }
         }
 
@@ -122,19 +147,28 @@ namespace Project_NGO.Controllers
         {
             try
             {
-                var resource = await _repository.DeleteProgram(id);
-                if (resource != null)
+                bool resource = await _repository.DeleteProgram(id);
+                if (resource)
                 {
-                    return StatusCode(StatusCodes.Status200OK, new Response { Status = "200", Message = "Deleted Successfully" });
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status200OK, "Delete Program Successfully", null, null);
+                    return Ok(response);
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new Response { Status = "400", Message = "Invalid Request" });
+                    var response = new CustomStatusResult<ProgramDTO>
+                        (StatusCodes.Status404NotFound, "Delete Program Failed", null, null);
+                    return NotFound(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "500", Message = "Error Server" });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
             }
         }
     }

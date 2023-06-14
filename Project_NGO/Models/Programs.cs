@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Runtime.Serialization;
-
-namespace Project_NGO.Models
+﻿namespace Project_NGO.Models
 {
     public class Programs
     {
@@ -12,17 +9,13 @@ namespace Project_NGO.Models
         public string? Image { get; set; }
 
         public string? Status { get; set; }
-        public int Category_Id { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public int CategoryId { get; set; }
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public virtual Category? Category { get; set; }
 
-        [JsonIgnore]
-        [IgnoreDataMember]
-        public virtual List<Program_Image>? Program_Images { get; set; }
+        public virtual List<Program_Image>? ProgramImages { get; set; }
 
-        [JsonIgnore]
-        [IgnoreDataMember]
         public virtual List<Receipt>? Receipt { get; set; }
     }
 }

@@ -8,11 +8,13 @@ using Project_NGO.Data;
 using Project_NGO.Models;
 using Project_NGO.Repositories;
 using Project_NGO.Repositories.Authenication;
+using Project_NGO.Repositories.CashOutRepo;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
 using Project_NGO.Requests.Program;
 using Project_NGO.Services;
 using Project_NGO.Services.Authenication;
+using Project_NGO.Services.CashOutService;
 using Project_NGO.Services.UploadFileService;
 using Project_NGO.Services.UserService;
 using System.Text;
@@ -27,6 +29,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ProgramRepository, ProgramService>();
 builder.Services.AddAutoMapper(typeof(ProgramProfile));
+builder.Services.AddScoped<ICashOutRepository, CashOutServiceImp>();
 
 // config identity
 builder.Services.AddIdentity<User, IdentityRole<int>>(options => options.User.RequireUniqueEmail = true)
