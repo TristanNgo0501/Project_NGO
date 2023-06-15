@@ -1,4 +1,6 @@
-﻿namespace Project_NGO.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Project_NGO.Models
 {
     public class Category
     {
@@ -7,6 +9,6 @@
         public string? Image { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public List<Programs> Programs { get; set; }
+        public List<Programs>? Programs { get; set; }
     }
 }
