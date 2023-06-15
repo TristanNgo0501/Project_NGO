@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Project_NGO.Models;
+using Project_NGO.Models.About;
 
 namespace Project_NGO.Data
 {
