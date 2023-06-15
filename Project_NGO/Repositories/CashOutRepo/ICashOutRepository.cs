@@ -12,5 +12,7 @@ namespace Project_NGO.Repositories.CashOutRepo
         Task<decimal> CashShow(int? programId);
 
         Task<decimal> CashOutShow(int programId);
+
+        Task<decimal> BalanceRemain(int programId);
     }
 }

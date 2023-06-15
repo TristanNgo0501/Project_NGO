@@ -32,7 +32,7 @@ namespace Project_NGO.Controllers
                 else
                 {
                     var response = new CustomStatusResult<CashResponse>
-                           (StatusCodes.Status400BadRequest, "Invalid Request", null, null);
+                           (StatusCodes.Status400BadRequest, "This program is not allowed to donate", null, null);
                     return BadRequest(response);
                 }
             }
@@ -55,13 +55,6 @@ namespace Project_NGO.Controllers
                 var resource = await _repository.CashOut(cashRequest);
                 if (resource != null)
                 {
-                    decimal balance = await _repository.CashShow(cashRequest.programId);
-                    if (cashRequest.money > balance)
-                    {
-                        var responseBalance = new CustomStatusResult<CashResponse>
-                           (StatusCodes.Status400BadRequest, "Withdraw Failed", null, null);
-                        return Ok(responseBalance);
-                    }
                     var response = new CustomStatusResult<CashResponse>
                            (StatusCodes.Status200OK, "Withdraw Successfully", resource, null);
                     return Ok(response);
@@ -69,7 +62,7 @@ namespace Project_NGO.Controllers
                 else
                 {
                     var response = new CustomStatusResult<CashResponse>
-                           (StatusCodes.Status400BadRequest, "Invalid Request", null, null);
+                           (StatusCodes.Status400BadRequest, "Your balance is not enough or not allow to withdraw", null, null);
                     return BadRequest(response);
                 }
             }
@@ -125,14 +118,45 @@ namespace Project_NGO.Controllers
                 {
                     var response = new CustomStatusResult<CashResponse>
                                (StatusCodes.Status200OK,
-                               "Get Cash List Successfully", new CashResponse { Money = cash }, null);
+                               "Get Total Amount  Successfully", new CashResponse { Money = cash }, null);
                     return Ok(response);
                 }
                 else
                 {
                     var response = new CustomStatusResult<CashResponse>
-                               (StatusCodes.Status404NotFound, "Can not get list cash", null, null);
-                    return BadRequest(response);
+                               (StatusCodes.Status404NotFound, "The money was 0", new CashResponse { Money = cash }, null);
+                    return NotFound(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                new
+                {
+                    ErrorMessage = "An error occurred while retrieving the user",
+                    ErrorDetails = ex.ToString()
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> TotalRemainBalance(int programId)
+        {
+            try
+            {
+                decimal balance = await _repository.BalanceRemain(programId);
+                if (balance != 0)
+                {
+                    var response = new CustomStatusResult<CashResponse>
+                    (StatusCodes.Status200OK,
+                               "Get Remain Balance Successfully", new CashResponse { Money = balance }, null);
+                    return Ok(response);
+                }
+                else
+                {
+                    var response = new CustomStatusResult<CashResponse>
+                               (StatusCodes.Status404NotFound, "Your Balance is empty", null, null);
+                    return NotFound(response);
                 }
             }
             catch (Exception ex)

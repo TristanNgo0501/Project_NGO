@@ -9,21 +9,23 @@ using Project_NGO.Models;
 using Project_NGO.Repositories;
 using Project_NGO.Repositories.Authenication;
 using Project_NGO.Repositories.CashOutRepo;
+using Project_NGO.Repositories.Categories;
+using Project_NGO.Repositories.NewFolder;
+using Project_NGO.Repositories.ReceiptRepo;
 using Project_NGO.Repositories.Chart;
 using Project_NGO.Repositories.UploadFileRepo;
 using Project_NGO.Repositories.UserRepo;
 using Project_NGO.Requests.Program;
-using Project_NGO.Repositories.Categories;
-using Project_NGO.Repositories.NewFolder;
 using Project_NGO.Services;
 using Project_NGO.Services.Authenication;
 using Project_NGO.Services.CashOutService;
+using Project_NGO.Services.Categories;
+using Project_NGO.Services.ContactForm;
+using Project_NGO.Services.ReceiptService;
 using Project_NGO.Services.Chart;
 using Project_NGO.Services.UploadFileService;
 using Project_NGO.Services.UserService;
 using System.Text;
-using Project_NGO.Services.Categories;
-using Project_NGO.Services.ContactForm;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +38,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ProgramRepository, ProgramService>();
 builder.Services.AddAutoMapper(typeof(ProgramProfile));
 builder.Services.AddScoped<ICashOutRepository, CashOutServiceImp>();
-
+builder.Services.AddScoped<IReceiptRepository, ReceiptServiceImp>();
 // config identity
 builder.Services.AddIdentity<User, IdentityRole<int>>(options => options.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<DatabaseContext>()
