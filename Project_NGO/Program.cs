@@ -54,6 +54,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options => options.User.Re
 builder.Services.AddScoped<IFileRepository, FileServiceImp>();
 builder.Services.AddScoped<ICategory, CategoryServiceImp>();
 builder.Services.AddScoped<IContactForm, ContactFormServiceImp>();
+builder.Services.AddScoped<IContactChartForm, ContactChartFormServiceImp>();
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectDb"));
