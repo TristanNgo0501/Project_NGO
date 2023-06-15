@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_NGO.Data;
+using Project_NGO.Models;
 using Project_NGO.Models.Chart;
 using Project_NGO.Repositories.Chart;
+using System.Collections.Generic;
 
 
 namespace Project_NGO.Services.Chart
@@ -12,6 +14,31 @@ namespace Project_NGO.Services.Chart
         public ChartServiceImp(DatabaseContext _dbcontext)
         {
             dbcontext = _dbcontext;
+        }
+
+        public async Task<IEnumerable<ReceptUserProgram>> GetListReceiptUserProgram()
+        {
+            var receipt = await dbcontext.Receipts
+                                         .Include(r => r.User)
+                                         .Include(r => r.Programs)
+                                         .Where(r => r.Type == ReceiptType.Price_In)
+                                         .Select(u => new ReceptUserProgram
+                                         {
+                                             Id = u.Id,
+                                             Money = u.Money,
+                                             Description = u.Description,
+                                             CreatedAt = u.CreatedAt,
+                                             Type = u.Type,
+                                             Name = u.User.Name,
+                                             UserId = u.UserId,
+                                             ProgramName = u.Programs.Title,
+                                             Status = u.Programs.Status
+                                         }).ToListAsync();
+            if (receipt.Count > 0 && receipt.Any())
+            {
+                return receipt;
+            }
+            return null;
         }
 
         public async Task<IEnumerable<ChartMapModel>> GetListRegionAsync()
