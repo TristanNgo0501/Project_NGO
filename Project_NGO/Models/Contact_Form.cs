@@ -15,13 +15,8 @@ namespace Project_NGO.Models
         [Required(ErrorMessage = "Email is required.")]
      //   [RegularExpression(@"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
-        public DateTime? CreatedAt
-        {
-            get
-            {
-                return DateTime.Now;
-            }
-        }
+        public DateTime? CreatedAt { get;set; }
+        
         [Required(ErrorMessage = "Message is required.")]
         public string Message { get; set; }
         public bool IsRead { get; set; }

@@ -78,7 +78,7 @@ namespace Project_NGO.Services.Categories
             {
                 cate.Image = cateDb.Image;
             }
-            _dbContext.Entry(cateDb).State = EntityState.Modified;
+            _dbContext.Entry(cate).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
             //var updatedCate = _mapper.Map<CategoryDTO>(cate);
             return cate;

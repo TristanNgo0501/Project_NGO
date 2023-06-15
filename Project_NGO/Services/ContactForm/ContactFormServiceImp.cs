@@ -17,6 +17,7 @@ namespace Project_NGO.Services.ContactForm
 
         public async Task<Contact_Form> AddContact_FormAsync(Contact_Form contactform)
         {
+            contactform.CreatedAt = DateTime.Now;
             await _dbContext.Contact_Forms.AddAsync(contactform);
             await _dbContext.SaveChangesAsync();
             return contactform;
