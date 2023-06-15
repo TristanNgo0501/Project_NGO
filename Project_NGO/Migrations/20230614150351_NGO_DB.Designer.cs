@@ -12,8 +12,8 @@ using Project_NGO.Data;
 namespace Project_NGO.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230613144739_initdatabase")]
-    partial class initdatabase
+    [Migration("20230614150351_NGO_DB")]
+    partial class NGO_DB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -157,7 +157,7 @@ namespace Project_NGO.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -166,27 +166,32 @@ namespace Project_NGO.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Account_Bank")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Account_Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Account_Number")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("QR_Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -197,7 +202,7 @@ namespace Project_NGO.Migrations
                     b.ToTable("Abouts", (string)null);
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About_Image", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About_Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -235,21 +240,50 @@ namespace Project_NGO.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.ToTable("Categories", (string)null);
+                });
+
+            modelBuilder.Entity("Project_NGO.Models.Contact_Form", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Mobilephone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contact_Form", (string)null);
                 });
 
             modelBuilder.Entity("Project_NGO.Models.Event", b =>
@@ -542,9 +576,9 @@ namespace Project_NGO.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About_Image", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About_Image", b =>
                 {
-                    b.HasOne("Project_NGO.Models.About", "About")
+                    b.HasOne("Project_NGO.Models.About.About", "About")
                         .WithMany("About_Images")
                         .HasForeignKey("About_Id")
                         .HasConstraintName("FK_About_AboutImages");
@@ -593,7 +627,7 @@ namespace Project_NGO.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About", b =>
                 {
                     b.Navigation("About_Images");
                 });

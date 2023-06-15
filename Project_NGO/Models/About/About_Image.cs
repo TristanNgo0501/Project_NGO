@@ -1,4 +1,4 @@
-﻿namespace Project_NGO.Models
+﻿namespace Project_NGO.Models.About
 {
     public class About_Image
     {
