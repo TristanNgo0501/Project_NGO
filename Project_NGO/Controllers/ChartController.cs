@@ -36,5 +36,27 @@ namespace Project_NGO.Controllers
             }
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetListReceiptUserProgram()
+        {
+            try
+            {
+                var result = await chartRepo.GetListReceiptUserProgram();
+                if (result != null)
+                {
+                    return CustomMethodResponse.GetListResponse200Ok(result, "Get list region success");
+                }
+                else
+                {
+                    return CustomMethodResponse.GetResponse404NotFound("Get list region fail");
+                }
+            }
+            catch (Exception ex)
+            {
+                return CustomMethodResponse.Response500Error(ex);
+            }
+
+        }
     }
 }

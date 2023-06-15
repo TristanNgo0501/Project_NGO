@@ -5,5 +5,6 @@ namespace Project_NGO.Repositories.Chart
     public interface IChartRepository
     {
         Task<IEnumerable<ChartMapModel>> GetListRegionAsync();
+        Task<IEnumerable<ReceptUserProgram>> GetListReceiptUserProgram();
     }
 }
