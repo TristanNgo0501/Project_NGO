@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_NGO.CustomStatusCode;
 using Project_NGO.Data;
 using Project_NGO.Models.About;
 using Project_NGO.Repositories.Abouts;
+using Project_NGO.Requests.Abouts;
+using Project_NGO.Responses;
 using Project_NGO.Services.Abouts;
 
 namespace Project_NGO.Controllers
@@ -23,51 +24,49 @@ namespace Project_NGO.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CustomResult<IEnumerable<About>>>> GetAbouts()
+        public async Task<ActionResult<IEnumerable<AboutResponse>>> GetAbouts()
         {
             try
             {
                 var resources = await _aboutRepository.GetAboutsAsync();
                 if (resources != null && resources.Any())
                 {
-                    var response = new CustomResult<IEnumerable<About>>(200,
+                    var response = new CustomResult<IEnumerable<AboutResponse>>(StatusCodes.Status200OK,
                         "Resources found", resources, null);
                     return Ok(response);
                 }
                 else
                 {
-                    var response = new CustomResult<IEnumerable<About>>(404,
+                    var response = new CustomResult<IEnumerable<AboutResponse>>(StatusCodes.Status404NotFound,
                         "No resources found", null, null);
-                    return (response);
+                    return NotFound(response);
                 }
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, new CustomResult<About>()
                 {
                     Message = "An error occurred while retrieving the model.",
                     Error = ex.Message
                 });
             }
-
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CustomResult<About>>> GetAbout(int id)
+        public async Task<ActionResult<CustomResult<AboutResponse>>> GetAbout(int id)
         {
             try
             {
                 var resource = await _aboutRepository.GetAboutByIdAsync(id);
                 if (resource == null)
                 {
-                    var response = new CustomResult<About>(404,
+                    var response = new CustomResult<AboutResponse>(StatusCodes.Status404NotFound,
                         "Resource not found", null, null);
                     return NotFound(response);
                 }
                 else
                 {
-                    var response = new CustomResult<About>(200,
+                    var response = new CustomResult<AboutResponse>(200,
                         "Get about successfully", resource, null);
 
                     return Ok(response);
@@ -75,19 +74,16 @@ namespace Project_NGO.Controllers
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, new CustomResult<About>()
                 {
                     Message = "An error occurred while retrieving the model.",
                     Error = ex.Message
                 });
             }
-
-
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAbout([FromForm] About about, IFormFile ? photo, List<IFormFile>? files)
+        public async Task<IActionResult> AddAbout([FromForm] RequestAddAbout about, IFormFile? photo, List<IFormFile>? files)
         {
             try
             {
@@ -96,41 +92,38 @@ namespace Project_NGO.Controllers
             }
             catch (DbUpdateException ex)
             {
-                
                 return CustomHandleResultJson.ErrorActionResult<About>(ex);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<CustomResult<About>>> UpdateAbout([FromForm] About about, IFormFile? photo)
+        public async Task<ActionResult<AboutResponse>> UpdateAbout([FromForm] RequestUpdateAbout about, int id, IFormFile? photo)
         {
             try
             {
-                var resource = await _aboutRepository.GetAboutByIdAsync(about.Id);
+                var resource = await _aboutRepository.UpdateAboutAsync(
+                        about, id, photo);
                 if (resource != null)
                 {
-                    var resourceUpdate = await _aboutRepository.UpdateAboutAsync(
-                        about, photo);
-                    var response = new CustomResult<About>(200,
-                        "update about successfully", resourceUpdate, null);
+                    var response = new CustomResult<AboutResponse>(StatusCodes.Status200OK,
+                        "update about successfully", resource, null);
                     return Ok(response);
                 }
                 else
                 {
-                    var response = new CustomResult<About>(404,
-                        "No about to update", null, null);
-                    return NotFound(response);
+                    var response = new CustomResult<AboutResponse>(StatusCodes.Status400BadRequest,
+                        "Invalid Request", null, null);
+                    return BadRequest(response);
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new CustomResult<About>()
+                return StatusCode(500, new CustomResult<AboutResponse>()
                 {
                     Message = "An error occurred while retrieving the model.",
                     Error = ex.Message
                 });
             }
-
         }
 
         [HttpDelete("{id}")]
@@ -145,7 +138,6 @@ namespace Project_NGO.Controllers
             }
             if (resourceDeleted)
             {
-
                 var response = new CustomResult<string>(200,
                     "Resource deleted successfully", null, null);
                 return Ok(response);
@@ -156,13 +148,11 @@ namespace Project_NGO.Controllers
                     "Resource not found or unable to delete", null, null);
                 return NotFound(response);
             }
-
         }
 
         [HttpPost("{id}")]
         public async Task<ActionResult<CustomResult<byte[]>>> GetQRCode(int id)
         {
-
             try
             {
                 var resource = await _aboutRepository.GetQRCode(id);
@@ -182,7 +172,6 @@ namespace Project_NGO.Controllers
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, new CustomResult<About>()
                 {
                     Message = "An error occurred while retrieving the model.",
@@ -190,6 +179,5 @@ namespace Project_NGO.Controllers
                 });
             }
         }
-
     }
 }
