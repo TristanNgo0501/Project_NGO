@@ -155,7 +155,7 @@ namespace Project_NGO.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,7 +195,7 @@ namespace Project_NGO.Migrations
                     b.ToTable("Abouts", (string)null);
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About_Image", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About_Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -578,9 +578,9 @@ namespace Project_NGO.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About_Image", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About_Image", b =>
                 {
-                    b.HasOne("Project_NGO.Models.About", "About")
+                    b.HasOne("Project_NGO.Models.About.About", "About")
                         .WithMany("About_Images")
                         .HasForeignKey("About_Id")
                         .HasConstraintName("FK_About_AboutImages");
@@ -629,7 +629,7 @@ namespace Project_NGO.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project_NGO.Models.About", b =>
+            modelBuilder.Entity("Project_NGO.Models.About.About", b =>
                 {
                     b.Navigation("About_Images");
                 });

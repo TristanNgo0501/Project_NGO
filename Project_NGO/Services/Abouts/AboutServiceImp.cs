@@ -81,7 +81,7 @@ namespace Project_NGO.Services.Abouts
                 {
                     await photo.CopyToAsync(stream);
                 }
-                about.Image = "http://localhost:5065/Uploads/Abouts/" + fileName;
+                about.Image = "http://localhost:5065/Abouts/" + fileName;
             }
             about.CreatedAt = DateTime.Now;
             await _dbContext.Abouts.AddAsync(about);
@@ -102,7 +102,7 @@ namespace Project_NGO.Services.Abouts
                         {
                             await file.CopyToAsync(stream);
                         }
-                        about.Image = "http://localhost:5065/Uploads/Abouts/" + fileName;
+                        about.Image = "http://localhost:5065/Abouts/" + fileName;
                         //uploadedFiles.Add(fileName);
                     }
                 }
@@ -140,7 +140,7 @@ namespace Project_NGO.Services.Abouts
                     await photo.CopyToAsync(stream);
                 }
 
-                about.Image = "http://localhost:5065/Uploads/Abouts/" + fileName;
+                about.Image = "http://localhost:5065/Abouts/" + fileName;
             }
             else
             {
